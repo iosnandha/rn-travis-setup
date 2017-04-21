@@ -1,17 +1,12 @@
+sudo: required
+dist: trusty
 language: node_js
 node_js:
-  - "7.2"
-sudo: false
-cache:
-  directories:
-    - $HOME/.yarn-cache
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+  - "iojs"
+  - "7"
 env:
   - NODE_ENV='test'
 script:
-  - cp env.example.js env.js
-  - npm run lint
   - npm test
   - npm run bundle:ios
 matrix:
