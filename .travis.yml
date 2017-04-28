@@ -1,19 +1,23 @@
 language: node_js
 node_js:
-  - "7.2"
-sudo: false
+- '7'
+sudo: required
+dist: trusty
+
 cache:
+  yarn: true
   directories:
-    - $HOME/.yarn-cache
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-env:
-  - NODE_ENV='test'
-script:
-  - cp env.example.js env.js
-  - npm run lint
-  - npm test
-  - npm run bundle:ios
+    - node_modules
+
+before_install:
+  - git config user.name 'travis-build'
+
+install:
+  - yarn install
+
+notifications:
+  email: false
+  
 matrix:
   include:
     - language: android
