@@ -1,20 +1,37 @@
 matrix:
   include:
+    - language: node_js
+      cache: yarn
+      node_js:
+        - "6.9"
+        - "7.1"
+      sudo: false
+      env:
+        - NODE_ENV='test'
+      script:
+        - cp env.example.js env.js
+        - npm run lint
+        - npm test
+        - npm run bundle:ios
     - language: android
       os: linux
-      jdk: oraclejdk8
+      jdk: oraclejdk7
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          - $HOME/.yarn-cache
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
       sudo: required
-      node_js: false
       before_install:
         - nvm install 7
         - node --version
-        - travis_retry curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+        - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
         - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-        - travis_retry sudo apt-get update -qq
-        - travis_retry sudo apt-get install -y -qq yarn
+        - sudo apt-get update -qq
+        - sudo apt-get install -y -qq yarn
       install:
         - yarn
         - npm install
@@ -31,19 +48,21 @@ matrix:
     - language: objective-c
       os: osx
       osx_image: xcode8.3
-      node_js: false
+      cache:
+        directories:
+          - $HOME/.yarn-cache
       before_install:
         - nvm install 7
         - node --version
-        - travis_retry npm install -g yarn
+        - npm install -g yarn
         - yarn -version
         - npm -version
       install:
-        - travis_retry gem install xcpretty
-        - travis_retry yarn
+        - gem install xcpretty
+        - yarn
       xcode_project: ios/rn_travis_setup.xcodeproj
-      xcode_scheme: ios/rn_travis_setup
+      xcode_scheme: ios/rn_travis_setupTests
       script:
         - cd ios
         - xcodebuild -scheme rn_travis_setup -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO | xcpretty
-        - travis_retry xctool run-tests -scheme rn_travis_setup -sdk iphonesimulator -launch-timeout 90  ONLY_ACTIVE_ARCH=NO
+        - xctool run-tests -scheme rn_travis_setup -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
